@@ -2,25 +2,32 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils, #[CurrentUser] $user): Response
     {
+        if (!is_null($user)) {
+            return $this->redirectToRoute('app_dahboard');
+        }
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', [
+        return $this->render('@EasyAdmin/page/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
+            'page_title' => 'Capital Bakery Login',
+            'csrf_token_intention' => 'authenticate',
         ]);
     }
 
